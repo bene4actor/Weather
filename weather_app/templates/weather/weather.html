@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Прогноз погоды</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+    <style>
+  #city-stats-list {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+  #city-stats-list.show {
+    opacity: 1;
+  }
+  button {
+    background-color: #ffb300;
+    color: black;
+    border: none;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+    <h1>Погода в городе</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Узнать погоду</button>
+    </form>
+
+    {% if weather %}
+        <h2>Погода в {{ weather.city }}, {{ weather.country }}</h2>
+        <ul>
+            <li>Температура: {{ weather.temperature }} °C</li>
+            <li>Скорость ветра: {{ weather.windspeed }} км/ч</li>
+            <li>Код погоды: {{ weather.weathercode }}</li>
+        </ul>
+    {% elif not_found %}
+        <p>Город "{{ form.city.value }}" не найден :(</p>
+    {% endif %}
+
+    {% if recent_cities %}
+        <h3>Последние города:</h3>
+        <ul>
+            {% for city in recent_cities %}
+                <li>{{ city }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div id="city-stats-container" style="margin-top: 30px;">
+        <h3>Статистика запросов городов</h3>
+        <ul id="city-stats-list" style="display:none;"></ul>
+        <button id="toggle-top10-btn">Показать топ-10</button>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  let top10Stats = [];
+  let visible = false;
+
+  async function loadCityStats() {
+    try {
+      const response = await fetch('/api/city-stats/');
+      if (!response.ok) throw new Error('Ошибка загрузки статистики');
+      const data = await response.json();
+
+      top10Stats = Object.entries(data).slice(0, 10);
+    } catch (e) {
+      console.error('Не удалось загрузить статистику', e);
+      document.getElementById('city-stats-list').innerHTML = '<li>Не удалось загрузить статистику</li>';
+    }
+  }
+
+  function renderTop10() {
+    const statsList = document.getElementById('city-stats-list');
+    statsList.innerHTML = '';
+    if (top10Stats.length === 0) {
+      statsList.innerHTML = '<li>Пока нет данных</li>';
+    } else {
+      for (const [city, count] of top10Stats) {
+        const li = document.createElement('li');
+        li.textContent = `${city}: ${count} ${count === 1 ? 'раз' : 'раз(а)'}`;
+        statsList.appendChild(li);
+      }
+    }
+  }
+
+  const toggleBtn = document.getElementById('toggle-top10-btn');
+  toggleBtn.addEventListener('click', () => {
+    const statsList = document.getElementById('city-stats-list');
+    visible = !visible;
+  if (visible) {
+    renderTop10();
+    statsList.style.display = 'block';
+    setTimeout(() => statsList.classList.add('show'), 10);  // плавный fadeIn
+    toggleBtn.textContent = 'Скрыть топ-10';
+  } else {
+    statsList.classList.remove('show');
+    setTimeout(() => statsList.style.display = 'none', 300);  // плавный fadeOut
+    toggleBtn.textContent = 'Показать топ-10';
+  }
+  });
+
+  loadCityStats();
+});
+</script>
+
+</body>
+</html>

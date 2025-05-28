@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Env & Virtualenv
+.env
+venv/
+env/
+*.env
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+static/
+
+# VSCode
+.vscode/
+
+# JetBrains (PyCharm, etc)
+.idea/
+
+# Migrations - включаем!
+# (НЕ игнорируем миграции, как ты хочешь)
+
+# Docker
+*.pid
+*.seed
+*.pid.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+
+# MyPy & Pytest
+.mypy_cache/
+.pytest_cache/
+coverage.xml
+pytestdebug.log
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Requirements lock
+Pipfile.lock
+poetry.lock
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node/npm (если вдруг используешь)
+node_modules/
